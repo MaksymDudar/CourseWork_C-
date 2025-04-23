@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/maksymdudarchuk/IT/Stydy/c++/beta",
-      "program": "/Users/maksymdudarchuk/IT/Stydy/c++/beta/build/Debug/outDebug"
+      "cwd": "/Users/maksymdudarchuk/IT/Stydy/c++/Coursework",
+      "program": "/Users/maksymdudarchuk/IT/Stydy/c++/Coursework/build/Debug/outDebug"
     }
   ]
 }
