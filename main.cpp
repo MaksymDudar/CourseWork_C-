@@ -3,58 +3,43 @@
 
 using namespace std;
 
-class borderCell
-{
-    bool isBold;
-
-public:
-    borderCell()
-    {
-        isBold = false;
-    }
-    borderCell(bool p)
-    {
-        isBold = p;
-    }
-    bool getBorder() { return isBold; }
-};
-
 class cell
 {
     bool isPainted;
     int lenghtLine;
-    borderCell *top;
-    borderCell *bottom;
-    borderCell *right;
-    borderCell *left;
+    int paintedLineVert;
+    int paintedLineGor;
+    bool top;
+    bool bottom;
+    bool right;
+    bool left;
 
 public:
     cell()
     {
-        borderCell obj;
-        top = &obj;
-        bottom = &obj;
-        right = &obj;
-        left = &obj;
+        top = false;
+        bottom = false;
+        right = false;
+        left = false;
 
         isPainted = false;
         lenghtLine = -1;
     }
 
-    void setcell(int t, borderCell topparams, borderCell bottomparams, borderCell rightparams, borderCell leftparams)
+    void setcell(int t, bool topparams, bool bottomparams, bool rightparams, bool leftparams)
     {
-        top = &topparams;
-        bottom = &bottomparams;
-        right = &rightparams;
-        left = &leftparams;
+        top = topparams;
+        bottom = bottomparams;
+        right = rightparams;
+        left = leftparams;
         lenghtLine = t;
     }
-    void setPaited(bool painted) { isPainted = painted; }
+    void setPaited() { isPainted = true; }
 
     bool getPainted() { return isPainted; }
     int getLenght() { return lenghtLine; }
-    bool getLeftPaint() { return left->getBorder(); }
-    bool getBottomPaint() { return bottom->getBorder(); }
+    bool getLeftPaint() { return left; }
+    bool getBottomPaint() { return bottom; }
 
     friend ostream &operator<<(ostream &stream, cell odj)
     {
@@ -117,40 +102,107 @@ public:
     {
         for (int w = 0; w < obj.width; w++)
         {
-            stream << "――";
+            stream << "\033[1;93m――――\033[0m";
         }
         stream << endl;
         for (int i = 0; i < obj.height; i++)
         {
-            stream << "│";
+            stream << "\033[1;93m|\033[0m";
 
             for (int t = 0; t < obj.width; t++)
             {
-                char paint = obj.get(i, t).getPainted() ? '#' : ' ';
-                string line = obj.get(i, t).getLeftPaint() ? "│" : "┆";
+                string paint = obj.get(i, t).getPainted() ? "###" : "   ";
+                string line = obj.get(i, t).getLeftPaint() ? "\033[1;93m|\033[0m" : "┆";
 
                 stream << paint << line;
             }
             stream << endl;
             for (int t = 0; t < obj.width; t++)
             {
-                string line = obj.get(i, t).getBottomPaint() ? "――" : "┄┄";
+                string line = obj.get(i, t).getBottomPaint() ? "\033[1;93m――――\033[0m" : "┄┄┄┄";
                 stream << line;
             }
             stream << endl;
         }
         return stream;
     }
-};
+    friend void paint(field &fiel, int h, int w)
+    {
+        if (h >= 0 && h < fiel.height && w >= 0 && w < fiel.width)
+        {
+            bool isPaintNeighborTop = false, isPaintNeighborBottom = false, isPaintNeighborLeft = false, isPaintNeighborRight = false;
 
+            if (h > 0)
+            {
+                isPaintNeighborTop = fiel.get(h - 1, w).getPainted();
+            }
+            if (h < fiel.height - 1)
+            {
+                isPaintNeighborBottom = fiel.get(h + 1, w).getPainted();
+            }
+            if (w > 0)
+            {
+                isPaintNeighborLeft = fiel.get(h, w - 1).getPainted();
+            }
+            if (w < fiel.width - 1)
+            {
+                isPaintNeighborRight = fiel.get(h , w + 1).getPainted();
+            }
+
+            if (!isPaintNeighborTop && !isPaintNeighborBottom && !isPaintNeighborLeft && !isPaintNeighborRight)
+            {
+                fiel.get(h, w).setPaited();
+            }
+        }
+    }
+};
 
 int main()
 {
-    borderCell bodrerbold(true);
-    borderCell bodrernotbold(false);
     field field(10, 10);
 
-    field.put(0, 0).setcell(4, bodrerbold, bodrerbold, bodrerbold, bodrerbold);
+    bool vert[10][11] = {
+        {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1},
+        {1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1},
+        {1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1},
+        {1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+        {1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1},
+        {1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1},
+        {1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1},
+        {1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1},
+        {1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1},
+        {1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1}};
+    bool gor[11][10] = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 1, 1, 1, 0, 0, 1, 1, 1},
+        {1, 1, 1, 0, 0, 1, 1, 0, 0, 0},
+        {0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+        {1, 1, 1, 1, 0, 0, 1, 1, 1, 1},
+        {0, 0, 0, 0, 0, 1, 1, 0, 0, 0},
+        {0, 0, 0, 1, 1, 0, 0, 1, 1, 1},
+        {1, 1, 1, 0, 0, 1, 1, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+    int num[10][10] = {
+        {4, 4, 3, 3, 3, 3, 3, 3, 3, 3},
+        {4, 4, 3, 3, 3, 3, 3, 3, 3, 3},
+        {4, 4, -1, -1, -1, 3, 3, -1, 4, 4},
+        {-1, -1, -1, -1, -1, 1, -1, -1, 4, 4},
+        {-1, -1, -1, 1, 1, 1, -1, -1, 4, 4},
+        {3, 3, 4, 4, -1, -1, -1, -1, -1, -1},
+        {3, 3, 4, 4, -1, -1, -1, -1, -1, -1},
+        {3, 3, 4, 2, 2, -1, -1, -1, 4, 4},
+        {3, 3, 3, 2, 2, 3, 3, 3, 4, 4},
+        {3, 3, 3, 2, 2, 3, 3, 3, 4, 4}};
+
+    for (int i = 0; i < 10; i++)
+    {
+        for (int t = 0; t < 10; t++)
+        {
+            field.put(i, t).setcell(num[i][t], gor[i][t], gor[i + 1][t], vert[i][t], vert[i][t + 1]);
+        }
+    }
 
     cout << field;
 
