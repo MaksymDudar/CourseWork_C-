@@ -6,6 +6,8 @@ using namespace std;
 
 int g_painted = 0;
 
+int g_iteretions = 0;
+
 class pos
 {
 public:
@@ -273,6 +275,7 @@ public:
 
     friend int paint(field &fiel, int h, int w)
     {
+        g_iteretions++;
         if (h >= 0 && h < fiel.height && w >= 0 && w < fiel.width)
         {
             bool borderCanPaint;
@@ -289,7 +292,7 @@ public:
             {
                 borderCanPaint = true;
             }
-
+            
             if (fiel.get(h, w).paintedLineHorizontal != 0 && fiel.get(h, w).paintedLineVertical != 0 && borderCanPaint)
             {
 
@@ -298,7 +301,7 @@ public:
                 fiel.get(h, w).paintedLineVertical--;
                 fiel.get(h, w).paintedLineHorizontal--;
 
-                if (fiel.get(h, w).left )
+                if (fiel.get(h, w).left)
                 {
                     fiel.get(h, w).paintedBorderHorizontal = true;
                 }
@@ -369,11 +372,16 @@ public:
     friend pos paint_cell(field &fiel, int h, int w)
     {
         pos ret(-1, -1);
+        int countNotPaintCell = not_paint_area(fiel, 0, 0);
+        int countCell = countNotPaintCell + g_painted;
+        int sizeArea = fiel.height * fiel.width;
         if (h >= 0 && h < fiel.height && w >= 0 && w < fiel.width)
         {
-            if (!fiel.get(h, w).getPainted() && border_cell(fiel, h, w))
+            if (!fiel.get(h, w).getPainted() && border_cell(fiel, h, w) && countCell == sizeArea)
             {
                 fiel.get(h, w).setPaited();
+                g_painted++;
+
                 if (h < fiel.height - 1)
                 {
                     fiel.get(h + 1, w).paintedLineVertical = fiel.get(h + 1, w).lenghtLine;
@@ -385,7 +393,6 @@ public:
                     fiel.get(h, w + 1).paintedBorderHorizontal = false;
                 }
 
-                g_painted++;
                 if (w == fiel.width - 1)
                 {
                     ret.h = h + 1;
@@ -403,38 +410,33 @@ public:
 
                 cout << "Paint cell" << endl;
                 cout << fiel;
-                // if (h == 4 && w == 1)
-                // {
-                //     exit(1);
-                // }
             }
             else if (w > 0)
             {
-                if (h > 0)
+
+                if (h > 0 && !fiel.get(h - 1, w).getPainted())
                 {
-                    if (!fiel.get(h - 1, w).getPainted())
-                    {
-                        fiel.get(h, w).paintedLineVertical = min(fiel.get(h - 1, w).paintedLineVertical, fiel.get(h, w).lenghtLine);
-                        fiel.get(h, w).paintedBorderVertical = fiel.get(h - 1, w).paintedBorderVertical;
-                    }
-                    else
-                    {
-                        fiel.get(h, w).paintedLineVertical = fiel.get(h, w).lenghtLine;
-                        fiel.get(h, w).paintedBorderVertical = false;
-                    }
+                    fiel.get(h, w).paintedLineVertical = min(fiel.get(h - 1, w).paintedLineVertical, fiel.get(h, w).lenghtLine);
+                    fiel.get(h, w).paintedBorderVertical = fiel.get(h - 1, w).paintedBorderVertical;
                 }
+                else
+                {
+                    fiel.get(h, w).paintedLineVertical = fiel.get(h, w).lenghtLine;
+                    fiel.get(h, w).paintedBorderVertical = false;
+                }
+
                 fiel.get(h, w).paintedLineHorizontal = fiel.get(h, w).lenghtLine;
                 fiel.get(h, w).paintedBorderHorizontal = false;
-                fiel.get(h, w).setPaited(false);
+                if (fiel.get(h, w).getPainted())
+                {
+                    g_painted--;
+                    fiel.get(h, w).setPaited(false);
+                }
                 cout << "Repaint cell w" << endl;
                 cout << h << " : " << w << endl;
                 cout << fiel.get(h, w).paintedBorderHorizontal << " ? " << fiel.get(h, w).paintedBorderVertical << endl;
 
                 cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
-                // if (h == 4 &&  w == 2)
-                // {
-                //     exit(1);
-                // }
 
                 ret = paint_cell(fiel, h, w - 1);
             }
@@ -451,21 +453,17 @@ public:
                     fiel.get(h, w).paintedBorderVertical = false;
                 }
                 fiel.get(h, w).paintedLineHorizontal = fiel.get(h, w).lenghtLine;
-                fiel.get(h, w).setPaited(false);
-
+                fiel.get(h, w).paintedBorderHorizontal = false;
+                if (fiel.get(h, w).getPainted())
+                {
+                    g_painted--;
+                    fiel.get(h, w).setPaited(false);
+                }
                 cout << "Repaint cell h" << endl;
                 cout << h << " : " << w << endl;
                 cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
-                
-                ret = paint_cell(fiel, h - 1, fiel.width - 1);
 
-            }
-            else if (h == fiel.height - 1 && w == fiel.width - 1)
-            {
-                cout << "Sucsesful paint.\n";
-                ret.h = fiel.height;
-                ret.w = fiel.width;
-                return ret;
+                ret = paint_cell(fiel, h - 1, fiel.width - 1);
             }
             else
             {
@@ -532,11 +530,11 @@ int main()
         }
     }
 
-    int t = paint(field, 0, 0);
+    paint(field, 0, 0);
 
     cout << field;
 
-    cout << t;
+    cout << g_iteretions;
 
     return 0;
 }
