@@ -18,13 +18,6 @@
 //         h = t;
 //         w = p;
 //     }
-//     bool operator<(const pos &other) const
-//     {
-//         if (h == other.h)
-//             return w < other.w;
-//         return h < other.h;
-//     }
-// };
 // set<pos> g_not_paint_cells;
 
 // class cell

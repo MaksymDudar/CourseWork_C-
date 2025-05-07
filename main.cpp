@@ -1,10 +1,11 @@
 #include <iostream>
 #include <iomanip>
 #include <set>
+#include <queue>
 
 using namespace std;
 
-int g_painted = 0;
+
 
 int g_iteretions = 0;
 
@@ -18,6 +19,9 @@ public:
         h = t;
         w = p;
     }
+    ~pos(){
+        // cout << "Dest" << endl;
+    }
     bool operator<(const pos &other) const
     {
         if (h == other.h)
@@ -25,171 +29,18 @@ public:
         return h < other.h;
     }
 };
-set<pos> g_not_paint_cells;
 
-class cell
-{
-    bool isPainted;
-
-public:
-    int lenghtLine;
-    int paintedLineVertical;
-    int paintedLineHorizontal;
-
-    bool paintedBorderVertical;
-    bool paintedBorderHorizontal;
-
-    bool top;
-    bool bottom;
-    bool right;
-    bool left;
-
-    cell()
-    {
-        top = false;
-        bottom = false;
-        right = false;
-        left = false;
-
-        paintedBorderVertical = false;
-        paintedBorderHorizontal = false;
-
-        isPainted = false;
-        lenghtLine = 99;
-        paintedLineVertical = 0;
-        paintedLineHorizontal = 0;
-    }
-
-    void setcell(int t, bool topparams, bool bottomparams, bool rightparams, bool leftparams)
-    {
-        top = topparams;
-        bottom = bottomparams;
-        right = rightparams;
-        left = leftparams;
-        lenghtLine = t;
-        paintedLineVertical = t;
-        paintedLineHorizontal = t;
-    }
-    void setPaited() { isPainted = true; }
-    void setPaited(bool t) { isPainted = t; }
-
-    bool getPainted() { return isPainted; }
-    int getLenght() { return lenghtLine; }
-    bool getLeftPaint() { return left; }
-    bool getBottomPaint() { return bottom; }
-
-    friend ostream &operator<<(ostream &stream, const cell &odj)
-    {
-        stream << odj.isPainted;
-        return stream;
-    }
-};
-
-class field
-{
-    int height;
-    int width;
-    cell **p;
-
-public:
-    field(int h, int w)
-    {
-        p = new cell *[h];
-        for (int i = 0; i < h; ++i)
-        {
-            p[i] = new cell[w];
-        }
-        if (!p)
-        {
-            cout << "Allocation error\n";
-            exit(1);
-        }
-        height = h;
-        width = w;
-    }
-
-    ~field()
-    {
-        for (int i = 0; i < height; ++i)
-        {
-            delete[] p[i];
-        }
-        delete[] p;
-    }
-    cell &put(int h, int w)
-    {
-        if (h < 0 || h >= height || w < 0 || w >= width)
-        {
-            cout << "Bounds error!\n";
-            exit(1);
-        }
-        return p[h][w];
-    };
-    cell &get(int h, int w) const
-    {
-        if (h < 0 || h >= height || w < 0 || w >= width)
-        {
-            cout << "Bounds error!\n";
-            exit(1);
-        }
-        return p[h][w];
-    };
-
-    friend ostream &operator<<(ostream &stream, const field &obj)
-    {
-        for (int w = 0; w < obj.width; w++)
-        {
-            stream << "\033[1;93m――――\033[0m";
-        }
-        stream << endl;
-        for (int i = 0; i < obj.height; i++)
-        {
-            stream << "\033[1;93m|\033[0m";
-
-            for (int t = 0; t < obj.width; t++)
-            {
-                string paint = obj.get(i, t).getPainted() ? "\033[1;31;41m###\033[0m" : "   ";
-                string line = obj.get(i, t).getLeftPaint() ? "\033[1;93m|\033[0m" : "┆";
-
-                stream << paint << line;
-            }
-            stream << endl;
-            for (int t = 0; t < obj.width; t++)
-            {
-                string line = obj.get(i, t).getBottomPaint() ? "\033[1;93m――――\033[0m" : "┄┄┄┄";
-                stream << line;
-            }
-            stream << endl;
-        }
-        return stream;
-    }
-
-    // friend int not_paint_area(field &fiel, int h, int w)
-    // {
-    //     int count = 0;
-
-    //     if (h >= 0 && h < fiel.height && w >= 0 && w < fiel.width)
-    //     {
-    //         pos obj(h, w);
-
-    //         if (!fiel.get(h, w).getPainted() && g_not_paint_cells.find(obj) != g_not_paint_cells.end())
-    //         {
-    //             count++;
-    //             g_not_paint_cells.insert(obj);
-    //             not_paint_area(fiel, h + 1, w);
-    //             not_paint_area(fiel, h, w + 1);
-    //         }
-    //         not_paint_area(fiel, h - 1, w);
-    //         not_paint_area(fiel, h, w - 1);
-    //     }
-    //     return count;
-    // }
 
     friend int not_paint_area(field &fiel, int start_h, int start_w)
     {
         queue<pos> q;
         set<pos> visited;
         int count = 0;
+
+        if (start_h < 0 || start_h >= fiel.height || start_w < 0 || start_w >= fiel.width){
+            cout << "122";
+            return 0;
+        }
 
         if (fiel.get(start_h, start_w).getPainted())
             return 0;
@@ -227,51 +78,6 @@ public:
         return count;
     }
 
-    friend bool border_cell(field &fiel, int h, int w)
-    {
-        bool isPaintNeighborTop, isPaintNeighborBottom, isPaintNeighborLeft, isPaintNeighborRight;
-
-        if (h > 0)
-        {
-            isPaintNeighborTop = fiel.get(h - 1, w).getPainted();
-        }
-        else
-        {
-            isPaintNeighborTop = false;
-        }
-        if (h < fiel.height - 1)
-        {
-            isPaintNeighborBottom = fiel.get(h + 1, w).getPainted();
-        }
-        else
-        {
-            isPaintNeighborBottom = false;
-        }
-        if (w > 0)
-        {
-            isPaintNeighborLeft = fiel.get(h, w - 1).getPainted();
-        }
-        else
-        {
-            isPaintNeighborLeft = false;
-        }
-        if (w < fiel.width - 1)
-        {
-            isPaintNeighborRight = fiel.get(h, w + 1).getPainted();
-        }
-        else
-        {
-            isPaintNeighborRight = false;
-        }
-        if (!isPaintNeighborTop && !isPaintNeighborBottom && !isPaintNeighborLeft && !isPaintNeighborRight)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     friend int paint(field &fiel, int h, int w)
     {
@@ -296,7 +102,7 @@ public:
             if (fiel.get(h, w).paintedLineHorizontal != 0 && fiel.get(h, w).paintedLineVertical != 0 && borderCanPaint)
             {
 
-                cout << h << " : " << w << endl;
+                // cout << h << " : " << w << endl;
 
                 fiel.get(h, w).paintedLineVertical--;
                 fiel.get(h, w).paintedLineHorizontal--;
@@ -344,7 +150,7 @@ public:
             }
             else
             {
-                cout << h << " : " << w << endl;
+                // cout << h << " : " << w << endl;
 
                 pos ret(-1, -1);
                 ret = paint_cell(fiel, h, w);
@@ -363,6 +169,7 @@ public:
         }
         else
         {
+            cout << h << " : " << w << endl;
             cout << "paint fiel size error";
             exit(1);
         }
@@ -375,12 +182,16 @@ public:
         int countNotPaintCell = not_paint_area(fiel, 0, 0);
         int countCell = countNotPaintCell + g_painted;
         int sizeArea = fiel.height * fiel.width;
+        cout << h << " : " << w << endl;
+        cout << countCell << "<>" << endl;
+        // countCell вставити в паінт щоб вставляти при необхідності
         if (h >= 0 && h < fiel.height && w >= 0 && w < fiel.width)
         {
             if (!fiel.get(h, w).getPainted() && border_cell(fiel, h, w) && countCell == sizeArea)
             {
-                fiel.get(h, w).setPaited();
+                fiel.get(h, w).setPaited(true);
                 g_painted++;
+
 
                 if (h < fiel.height - 1)
                 {
@@ -403,21 +214,30 @@ public:
                     ret.h = h;
                     ret.w = w + 1;
                 }
-                cout << h << " : " << w << endl;
-                cout << fiel.get(h, w).paintedBorderHorizontal << " ? " << fiel.get(h, w).paintedBorderVertical << endl;
+                // cout << h << " : " << w << endl;
+                // cout << fiel.get(h, w).paintedBorderHorizontal << " ? " << fiel.get(h, w).paintedBorderVertical << endl;
 
-                cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
+                // cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
 
-                cout << "Paint cell" << endl;
+                // cout << "Paint cell" << endl;
                 cout << fiel;
             }
             else if (w > 0)
             {
 
-                if (h > 0 && !fiel.get(h - 1, w).getPainted())
+                if (h > 0)
                 {
-                    fiel.get(h, w).paintedLineVertical = min(fiel.get(h - 1, w).paintedLineVertical, fiel.get(h, w).lenghtLine);
-                    fiel.get(h, w).paintedBorderVertical = fiel.get(h - 1, w).paintedBorderVertical;
+                    if (!fiel.get(h - 1, w).getPainted())
+
+                    {
+                        fiel.get(h, w).paintedLineVertical = min(fiel.get(h - 1, w).paintedLineVertical, fiel.get(h, w).lenghtLine);
+                        fiel.get(h, w).paintedBorderVertical = fiel.get(h - 1, w).paintedBorderVertical;
+                    }
+                    else
+                    {
+                        fiel.get(h, w).paintedLineVertical = fiel.get(h, w).lenghtLine;
+                        fiel.get(h, w).paintedBorderVertical = false;
+                    }
                 }
                 else
                 {
@@ -432,11 +252,11 @@ public:
                     g_painted--;
                     fiel.get(h, w).setPaited(false);
                 }
-                cout << "Repaint cell w" << endl;
-                cout << h << " : " << w << endl;
-                cout << fiel.get(h, w).paintedBorderHorizontal << " ? " << fiel.get(h, w).paintedBorderVertical << endl;
+                // cout << "Repaint cell w" << endl;
+                // cout << h << " : " << w << endl;
+                // cout << fiel.get(h, w).paintedBorderHorizontal << " ? " << fiel.get(h, w).paintedBorderVertical << endl;
 
-                cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
+                // cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
 
                 ret = paint_cell(fiel, h, w - 1);
             }
@@ -459,9 +279,9 @@ public:
                     g_painted--;
                     fiel.get(h, w).setPaited(false);
                 }
-                cout << "Repaint cell h" << endl;
-                cout << h << " : " << w << endl;
-                cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
+                // cout << "Repaint cell h" << endl;
+                // cout << h << " : " << w << endl;
+                // cout << fiel.get(h, w).paintedLineHorizontal << " | " << fiel.get(h, w).paintedLineVertical << endl;
 
                 ret = paint_cell(fiel, h - 1, fiel.width - 1);
             }
@@ -538,3 +358,24 @@ int main()
 
     return 0;
 }
+
+// int right_not_paint_line = 0, top_not_paint_line = 0;
+// if (!fiel.get(h, w).get_right() && !fiel.get(h, w - 1).get_is_painted()){
+//     right_not_paint_line = fiel.get(h, w - 1).get_length_not_painted_line_in_area();
+// }
+
+// if (!fiel.get(h, w).get_top() && !fiel.get(h - 1, w).get_is_painted()){
+//     top_not_paint_line = fiel.get(h - 1, w).get_length_not_painted_line_in_area();
+// }
+// int lenght = right_not_paint_line + top_not_paint_line + 1;
+
+// int right_not_paint_line_update = w, top_not_paint_line_update = h;
+// while (!fiel.get(top_not_paint_line_update, w).get_top() && !fiel.get(top_not_paint_line_update - 1, w).get_is_painted()){
+//     fiel.get(top_not_paint_line_update, w).set_length_not_painted_line_in_area(lenght);
+//     top_not_paint_line_update--;
+// }
+
+// while (!fiel.get(h, right_not_paint_line_update).get_right() && !fiel.get(h, right_not_paint_line_update - 1).get_is_painted()){
+//     fiel.get(h, right_not_paint_line_update).set_length_not_painted_line_in_area(lenght);
+//     right_not_paint_line_update--;
+// }
