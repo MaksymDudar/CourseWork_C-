@@ -1,3 +1,8 @@
 *.o
+/output/
+/.vscode/
+/build/
 
-*exe
+course
+*.exe
+*.out

@@ -59,6 +59,7 @@ pos paint_cell(field &fiel, int h, int w) {
     pos req;
 
     if(fiel.is_inside_field(h, w)){
+        pos cell(h, w);
         if(!fiel.get(h, w).get_is_painted() && fiel.do_not_get_neighbors(h, w)){
             fiel.get(h, w).set_is_painted(true);
 
@@ -96,6 +97,8 @@ pos paint_cell(field &fiel, int h, int w) {
             if (fiel.get(h, w).get_is_painted())
             {
                 fiel.get(h, w).set_is_painted(false);
+            } else {
+                not_paint_cell.
             }
             req = paint_cell(fiel, h, w - 1);
         } else if (h > 0) {
