@@ -1,5 +1,5 @@
 CXX = clang++
 CXXFLAGS = -Wall -std=c++17
 
-course: play.cpp paint_method.cpp structure_of_field.cpp 
-	$(CXX) $(CXXFLAGS) -o course play.cpp paint_method.cpp structure_of_field.cpp 
+course: task25.cpp global_state.cpp paint_method.cpp field.cpp cell.cpp instuction.cpp
+	$(CXX) $(CXXFLAGS) -o course task25.cpp global_state.cpp paint_method.cpp field.cpp cell.cpp instuction.cpp

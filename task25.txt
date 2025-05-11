@@ -1,0 +1,11 @@
+Write a program in which - paint over some lethins on 
+the playing field,two painted lethins should not stick 
+together with each other, and allunpainted lethins form a
+single continuous area. Cells with numbers canbe painted 
+over, or you can leave unpainted, the numbers in blocks
+denote the maximum size of a continuous line of unpainted
+litelitins within a given block. The unpainted region does
+not necessarily have to be equal to this number, but a
+continuous line of unpainted litites is not may exceed this
+value. Any continuous horizontal or vertical line of 
+unpainted lethitins cannot cross more than one bold line.
