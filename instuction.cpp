@@ -9,6 +9,11 @@ string bold_vertical = "\033[1;93m|\033[0m";
 string not_bold_horizontal = "―";
 string bold_horizontal = "\033[1;93m―\033[0m";
 
+/* ---------------------------------------------------------------------[<]-
+Function:   center_text_print
+Synopsis:   Prints a given string centered within a fixed width, surrounded by vertical borders
+Arguments:  s - the string to print; ansi_sumbol - extra padding for ANSI escape sequences
+---------------------------------------------------------------------[>]-*/
 void center_text_print(const string &s, int ansi_sumbol = 0){
     int str_length = s.length();
     int padding_left = (WIDTH - str_length + ansi_sumbol) / 2;
@@ -19,6 +24,10 @@ void center_text_print(const string &s, int ansi_sumbol = 0){
     cout << bold_vertical << endl;
 }
 
+/* ---------------------------------------------------------------------[<]-
+Function:   line_print
+Synopsis:   Prints a horizontal line representing the top or bottom border of a block
+---------------------------------------------------------------------[>]-*/
 void line_print(){
     for (int i = 0; i < WIDTH + 2; i++){
         cout << bold_horizontal;
@@ -26,6 +35,10 @@ void line_print(){
     cout << endl;
 }
 
+/* ---------------------------------------------------------------------[<]-
+Function:   start_print
+Synopsis:   Displays the welcome screen with title, author, and group information
+---------------------------------------------------------------------[>]-*/
 void start_print() {
     string welcome = "Welcome! This is Task 25";
     string author = "Creat by: Maksym Dudarchuk";
@@ -40,6 +53,11 @@ void start_print() {
     line_print();
 };
 
+/* ---------------------------------------------------------------------[<]-
+Function:   task_print
+Synopsis:   Reads and prints the task description from a file in a formatted layout
+Note:       Exits the program if the file cannot be opened
+---------------------------------------------------------------------[>]-*/
 void task_print() {
     string task_text = "\033[1mTask\033[0m";
     ifstream file(name_file_with_rule);
@@ -63,6 +81,10 @@ void task_print() {
     line_print();
 };
 
+/* ---------------------------------------------------------------------[<]-
+Function:   marking_print
+Synopsis:   Displays the legend for interpreting field markings and symbols
+---------------------------------------------------------------------[>]-*/
 void marking_print(){
     string marking_text = "\033[1m Marking\033[0m";
     string not_bold_vertical_text = "Not bold vertical: ";
@@ -101,13 +123,17 @@ void marking_print(){
     line_print();
 };
 
+/* ---------------------------------------------------------------------[<]-
+Function:   menu_print
+Synopsis:   Prints the menu options for interacting with the program
+---------------------------------------------------------------------[>]-*/
 void menu_print() {
     string menu_text = "\033[1m Menu\033[0m";
-    string a_text = "\033[1m A.\033[0m Print task                    ";
-    string b_text = "\033[1m B.\033[0m Print marking                 ";
-    string c_text = "\033[1m C.\033[0m Print print empty field       ";
-    string d_text = "\033[1m D.\033[0m Print print filled field      ";
-    string e_text = "\033[1m E.\033[0m Exit                          ";
+    string a_text = "\033[1m A.\033[0m Print task        ";
+    string b_text = "\033[1m B.\033[0m Print marking     ";
+    string c_text = "\033[1m C.\033[0m Print empty field ";
+    string d_text = "\033[1m D.\033[0m Print filled field";
+    string e_text = "\033[1m E.\033[0m Exit              ";
 
     line_print();
     center_text_print(empty_string);
@@ -120,6 +146,24 @@ void menu_print() {
     center_text_print(d_text, 8);
     center_text_print(e_text, 8);    
 
+    center_text_print(empty_string);
+    line_print();
+};
+
+/* ---------------------------------------------------------------------[<]-
+Function:   resources_print
+Synopsis:   Prints execution statistics including iteration count and elapsed time
+Arguments:  duration - the total time taken by the algorithm
+---------------------------------------------------------------------[>]-*/
+void resources_print(chrono::duration<double> duration){
+    string count_iteration = "Iterations were made: ";
+    string count_time = "Time spent: ";
+
+    line_print();
+    center_text_print(empty_string);
+    center_text_print(name_file_with_rule);
+    center_text_print(count_iteration + to_string(g_counter_iteration));
+    center_text_print(count_time + to_string(duration.count()));
     center_text_print(empty_string);
     line_print();
 };

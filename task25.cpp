@@ -18,18 +18,17 @@ Description: Write a program in which - paint over some lethins on the playing f
             cannot cross more than one bold line.
 ----------------------------------------------------------------------------------</Header>-*/
 
-#include <iostream>
 #include "paint_method.h"
 #include "instuction.h"
 
 using namespace std;
 
 /* ---------------------------------------------------------------------[<]-
-Function:   put_cell_to_firld
+Function:   put_cell_to_field
 Synopsis:   Fills the created field with bold lines and numbers in blocks from
             arrays (which are in the file global_state.h)
 ---------------------------------------------------------------------[>]-*/
-void put_cell_to_firld(field &fiel, int type_fiel){
+void put_cell_to_field(field &fiel){
     for (int i = 0; i < fiel.get_height(); i++){
         for (int t = 0; t < fiel.get_width(); t++){
             if (num10x10[i][t] == -1){
@@ -47,17 +46,20 @@ Synopsis:   Main method of program
 ---------------------------------------------------------------------[>]-*/
 int main(void){
     field field_10(FIELD_SIZE_10, FIELD_SIZE_10);
-    put_cell_to_firld(field_10, 10);
+    put_cell_to_field(field_10);
     field field_10_copy = field_10;
 
+    auto start = chrono::high_resolution_clock::now();
     paint(field_10_copy, 0, 0);
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
 
     start_print();
     char choise;
     while (true)
     {
         menu_print();
-        cout << "Enter choise:";
+        cout << "Enter choice:";
         cin >> choise;
         tolower(choise);
         switch (choise){
@@ -76,6 +78,7 @@ int main(void){
         break;
         case 'd':{
             cout << field_10_copy;
+            resources_print(duration);
         }
         break;
         case 'e':{

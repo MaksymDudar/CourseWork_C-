@@ -1,11 +1,20 @@
 
 #include "paint_method.h"
 
+
+/* ---------------------------------------------------------------------[<]-
+Function:   paint
+Synopsis:   Attempts to fill the field with unpainted cells while checking all constraints
+Arguments:  fiel - reference to the field object
+            h - current row index
+            w - current column index
+Returns:    0 on successful painting
+Note:       Recursively fills the field or delegates to paint_cell if constraints fail
+---------------------------------------------------------------------[>]-*/
 int paint(field &fiel, int h, int w){
-    counter_iteration++;
+    g_counter_iteration++;
     if (fiel.is_inside_field(h,w)){
-        if (fiel.get(h, w).get_painted_border_horizontal() < NUM_OF_BOLD_LINE_CAN_CROSS + 1 && fiel.get(h, w).get_painted_border_vertical() < NUM_OF_BOLD_LINE_CAN_CROSS + 1 && fiel.length_not_painted_line_in_area(h, w) <= fiel.get(h, w).get_length_line())
-        {
+        if (fiel.get(h, w).get_painted_border_horizontal() < NUM_OF_BOLD_LINE_CAN_CROSS + 1 && fiel.get(h, w).get_painted_border_vertical() < NUM_OF_BOLD_LINE_CAN_CROSS + 1 && fiel.length_not_painted_line_in_area(h, w) <= fiel.get(h, w).get_length_line()){
             pos cell(h, w);
             if (!g_not_paint_cell.count(cell)){
                 g_not_paint_cell.insert(cell);
@@ -13,7 +22,6 @@ int paint(field &fiel, int h, int w){
                 cout << "not_paint_cell erro";
                 exit(1);
             }
-
             if (fiel.get(h, w).get_left()){
                 fiel.get(h, w).increment_painted_border_horizontal();
             }
@@ -34,9 +42,7 @@ int paint(field &fiel, int h, int w){
             } else {
                 return 0;
             }
-        }
-        else
-        {
+        } else {
             pos req;
             req = paint_cell(fiel, h, w);
             if (h == fiel.get_height() - 1 && w == fiel.get_width() - 1){
@@ -58,6 +64,15 @@ int paint(field &fiel, int h, int w){
     return 0;
 };
 
+/* ---------------------------------------------------------------------[<]-
+Function:   paint_cell
+Synopsis:   Attempts to paint a specific cell if all conditions are met
+Arguments:  fiel - reference to the field
+            h - row index of the cell
+            w - column index of the cell
+Returns:    The next position to continue painting from
+Note:       Reverts changes if painting violates connectivity or region constraints
+---------------------------------------------------------------------[>]-*/
 pos paint_cell(field &fiel, int h, int w) {
     pos req;
 
@@ -80,9 +95,6 @@ pos paint_cell(field &fiel, int h, int w) {
                 fiel.get(h, w).set_is_painted(false);
                 g_paint_counter--;
                 clear_cell(fiel, h, w);
-                if (g_not_paint_cell.count(cell)){
-                    g_not_paint_cell.erase(cell);
-                }
                 if (w > 0){
                     req = paint_cell(fiel, h, w - 1);
                 } else if(h > 0){
@@ -110,12 +122,12 @@ pos paint_cell(field &fiel, int h, int w) {
                 }
             }
         } else if (w > 0) {
-            counter_iteration++;
+            g_counter_iteration++;
             clear_cell(fiel, h, w);
             req = paint_cell(fiel, h, w - 1);
 
         } else if (h > 0) {
-            counter_iteration++;
+            g_counter_iteration++;
             clear_cell(fiel, h, w);
             req = paint_cell(fiel, h - 1, fiel.get_width() - 1);
         } else {
@@ -130,6 +142,13 @@ pos paint_cell(field &fiel, int h, int w) {
     return req;
 };
 
+/* ---------------------------------------------------------------------[<]-
+Function:   clear_cell
+Synopsis:   Reverts painting of a cell and updates neighboring borders
+Arguments:  fiel - reference to the field
+            h - row index
+            w - column index
+---------------------------------------------------------------------[>]-*/
 void clear_cell(field &fiel, int h, int w){
     pos cell(h, w);
     if (h > 0 && !fiel.get(h - 1, w).get_is_painted()){

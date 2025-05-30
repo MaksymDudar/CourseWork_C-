@@ -1,5 +1,9 @@
 #include "cell.h"
 
+/* ---------------------------------------------------------------------[<]-
+Function:   cell
+Synopsis:   defult constructor class cell
+---------------------------------------------------------------------[>]-*/
 cell::cell(){
     top = false;
     bottom = false;
@@ -13,6 +17,10 @@ cell::cell(){
     length_line = 99;
 }
 
+/* ---------------------------------------------------------------------[<]-
+Function:   set_cell
+Synopsis:   set some parameters of cell
+---------------------------------------------------------------------[>]-*/
 void cell::set_cell(int t, bool topparams, bool bottomparams, bool rightparams, bool leftparams){
     top = topparams;
     bottom = bottomparams;

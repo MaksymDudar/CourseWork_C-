@@ -7,10 +7,11 @@
 #define NUM_OF_BOLD_LINE_CAN_CROSS 1
 #define FIELD_SIZE_6 6
 #define FIELD_SIZE_10 10
-#define WIDTH 80
+#define WIDTH 70
 
+extern std::set<pos> g_not_paint_cell;
 extern int g_paint_counter;
-extern int counter_iteration;
+extern int g_counter_iteration;
 
 //Array 
 // 10x10 Array

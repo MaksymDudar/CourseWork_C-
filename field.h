@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <set>
+#include <queue>
 
 #include "cell.h"
 #include "pos.h"
@@ -11,8 +12,18 @@ using namespace std;
 
 extern std::set<pos> g_not_paint_cell;
 
-class field
-{
+/* ---------------------------------------------------------------------[<]-
+Class:      field
+Synopsis:   The class includes the coordinates inside, whether it is shaded,
+            the maximum possible length of the line of unpainted cells
+            (if it is not, then it is filled with the result of multiplying
+            the length of the field by its width), the number of crossed bold
+            lines with a line of unpainted cells horizontally or vertically.
+            It also includes whether it is surrounded by bold borders above,
+            below, right and left. Methods for working with cell variables
+            have also been added.
+---------------------------------------------------------------------[>]-*/
+class field{
     int height;
     int width;
     cell **p;

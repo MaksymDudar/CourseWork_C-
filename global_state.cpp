@@ -1,7 +1,8 @@
 #include "global_state.h"
 
+std::set<pos> g_not_paint_cell;
 int g_paint_counter = 0;
-int counter_iteration = 0;
+int g_counter_iteration = 0;
 
 // Array
 //  6x6 Array
